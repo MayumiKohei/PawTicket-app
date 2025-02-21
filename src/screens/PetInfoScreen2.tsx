@@ -8,11 +8,15 @@ import {
 	TouchableOpacity,
 	ScrollView,
 	Image,
+	Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
+import { useNavigation } from "@react-navigation/native";
 
-export default function NewPetInfoScreen() {
+export default function PetInfoScreen2() {
+	const navigation = useNavigation();
+
 	// 名前・犬種
 	const [petName, setPetName] = useState("");
 	const [petBreed, setPetBreed] = useState("");
@@ -25,10 +29,6 @@ export default function NewPetInfoScreen() {
 	const [sex, setSex] = useState("");
 	const [showSexPicker, setShowSexPicker] = useState(false);
 
-	// 性格
-	const [personality, setPersonality] = useState("");
-	const [showPersonalityPicker, setShowPersonalityPicker] = useState(false);
-
 	// 生年月日
 	const [birthYear, setBirthYear] = useState("2023");
 	const [birthMonth, setBirthMonth] = useState("01");
@@ -38,12 +38,19 @@ export default function NewPetInfoScreen() {
 	// 写真: 最大3枚
 	const [photos, setPhotos] = useState<string[]>([]);
 
-	// カメラ
+	// エラー文言
+	const [errorName, setErrorName] = useState("");
+	const [errorBreed, setErrorBreed] = useState("");
+	const [errorSize, setErrorSize] = useState("");
+	const [errorSex, setErrorSex] = useState("");
+	const [errorPhotos, setErrorPhotos] = useState("");
+
+	// カメラ撮影
 	const handlePickPhotoFromCamera = async () => {
 		const { status: cameraStatus } =
 			await ImagePicker.requestCameraPermissionsAsync();
 		if (cameraStatus !== "granted") {
-			alert("カメラ使用の許可が必要です");
+			Alert.alert("エラー", "カメラ使用の許可が必要です");
 			return;
 		}
 		const result = await ImagePicker.launchCameraAsync({
@@ -55,21 +62,21 @@ export default function NewPetInfoScreen() {
 			if (photos.length < 3) {
 				setPhotos([...photos, uri]);
 			} else {
-				alert("最大3枚まで登録できます");
+				Alert.alert("エラー", "最大3枚まで登録できます");
 			}
 		}
 	};
 
-	// ライブラリ
+	// ライブラリから選択
 	const handlePickPhotoFromLibrary = async () => {
 		const { status: libraryStatus } =
 			await ImagePicker.requestMediaLibraryPermissionsAsync();
 		if (libraryStatus !== "granted") {
-			alert("写真ライブラリへのアクセス許可が必要です");
+			Alert.alert("エラー", "写真ライブラリへのアクセス許可が必要です");
 			return;
 		}
 		const result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			mediaTypes: "images",
 			allowsMultipleSelection: false,
 			quality: 1,
 		});
@@ -78,26 +85,48 @@ export default function NewPetInfoScreen() {
 			if (photos.length < 3) {
 				setPhotos([...photos, uri]);
 			} else {
-				alert("最大3枚まで登録できます");
+				Alert.alert("エラー", "最大3枚まで登録できます");
 			}
 		}
 	};
 
-	// 登録
+	// 登録ボタン押下時の必須チェック
 	const handleRegister = () => {
-		const data = {
-			petName,
-			petBreed,
-			size,
-			sex,
-			personality,
-			birthYear,
-			birthMonth,
-			birthDay,
-			photos,
-		};
-		console.log("Register data:", data);
-		// TODO: サーバー送信 / ストレージ保存 等
+		let hasError = false;
+		// エラー文言クリア
+		setErrorName("");
+		setErrorBreed("");
+		setErrorSize("");
+		setErrorSex("");
+		setErrorPhotos("");
+
+		if (!petName.trim()) {
+			setErrorName("名前は必須です");
+			hasError = true;
+		}
+		if (!petBreed.trim()) {
+			setErrorBreed("犬種は必須です");
+			hasError = true;
+		}
+		if (!size) {
+			setErrorSize("大きさを選択してください");
+			hasError = true;
+		}
+		if (!sex) {
+			setErrorSex("性別を選択してください");
+			hasError = true;
+		}
+		if (photos.length === 0) {
+			setErrorPhotos("写真を少なくとも1枚登録してください");
+			hasError = true;
+		}
+
+		if (hasError) {
+			return;
+		}
+
+		// エラーがなければ次の画面へ遷移
+		navigation.navigate("PetInfo3" as never);
 	};
 
 	return (
@@ -111,6 +140,9 @@ export default function NewPetInfoScreen() {
 					onChangeText={setPetName}
 					placeholder="例: ポチ"
 				/>
+				{errorName ? (
+					<Text style={styles.errorText}>{errorName}</Text>
+				) : null}
 
 				{/* 犬種 */}
 				<Text style={styles.label}>犬種</Text>
@@ -120,6 +152,9 @@ export default function NewPetInfoScreen() {
 					onChangeText={setPetBreed}
 					placeholder="例: 柴犬"
 				/>
+				{errorBreed ? (
+					<Text style={styles.errorText}>{errorBreed}</Text>
+				) : null}
 
 				{/* 大きさ */}
 				<Text style={styles.label}>大きさ</Text>
@@ -127,7 +162,7 @@ export default function NewPetInfoScreen() {
 					style={styles.selectBox}
 					onPress={() => setShowSizePicker(!showSizePicker)}
 				>
-					<Text>{size}</Text>
+					<Text>{size || "選択してください"}</Text>
 				</TouchableOpacity>
 				{showSizePicker && (
 					<View style={styles.pickerContainer}>
@@ -141,15 +176,20 @@ export default function NewPetInfoScreen() {
 							<Picker.Item label="中型犬" value="中型犬" />
 							<Picker.Item label="大型犬" value="大型犬" />
 						</Picker>
-						{/* OKボタン: これを押すまで閉じない */}
 						<TouchableOpacity
 							style={styles.closePickerButton}
-							onPress={() => setShowSizePicker(false)}
+							onPress={() => {
+								if (!size) setSize("小型犬");
+								setShowSizePicker(false);
+							}}
 						>
 							<Text style={{ color: "#fff" }}>OK</Text>
 						</TouchableOpacity>
 					</View>
 				)}
+				{errorSize ? (
+					<Text style={styles.errorText}>{errorSize}</Text>
+				) : null}
 
 				{/* 性別 */}
 				<Text style={styles.label}>性別</Text>
@@ -157,7 +197,7 @@ export default function NewPetInfoScreen() {
 					style={styles.selectBox}
 					onPress={() => setShowSexPicker(!showSexPicker)}
 				>
-					<Text>{sex}</Text>
+					<Text>{sex || "選択してください"}</Text>
 				</TouchableOpacity>
 				{showSexPicker && (
 					<View style={styles.pickerContainer}>
@@ -172,45 +212,18 @@ export default function NewPetInfoScreen() {
 						</Picker>
 						<TouchableOpacity
 							style={styles.closePickerButton}
-							onPress={() => setShowSexPicker(false)}
+							onPress={() => {
+								if (!sex) setSex("オス");
+								setShowSexPicker(false);
+							}}
 						>
 							<Text style={{ color: "#fff" }}>OK</Text>
 						</TouchableOpacity>
 					</View>
 				)}
-
-				{/* 性格 */}
-				<Text style={styles.label}>性格</Text>
-				<TouchableOpacity
-					style={styles.selectBox}
-					onPress={() =>
-						setShowPersonalityPicker(!showPersonalityPicker)
-					}
-				>
-					<Text>{personality}</Text>
-				</TouchableOpacity>
-				{showPersonalityPicker && (
-					<View style={styles.pickerContainer}>
-						<Picker
-							style={styles.picker}
-							itemStyle={styles.pickerItem}
-							selectedValue={personality}
-							onValueChange={(val) => setPersonality(val)}
-						>
-							<Picker.Item
-								label="おとなしい"
-								value="おとなしい"
-							/>
-							<Picker.Item label="ヤンチャ" value="ヤンチャ" />
-						</Picker>
-						<TouchableOpacity
-							style={styles.closePickerButton}
-							onPress={() => setShowPersonalityPicker(false)}
-						>
-							<Text style={{ color: "#fff" }}>OK</Text>
-						</TouchableOpacity>
-					</View>
-				)}
+				{errorSex ? (
+					<Text style={styles.errorText}>{errorSex}</Text>
+				) : null}
 
 				{/* 生年月日 */}
 				<Text style={styles.label}>生年月日</Text>
@@ -242,7 +255,6 @@ export default function NewPetInfoScreen() {
 									);
 								})}
 							</Picker>
-
 							<Picker
 								style={[styles.birthPicker, styles.picker]}
 								itemStyle={styles.pickerItem}
@@ -263,7 +275,6 @@ export default function NewPetInfoScreen() {
 									);
 								})}
 							</Picker>
-
 							<Picker
 								style={[styles.birthPicker, styles.picker]}
 								itemStyle={styles.pickerItem}
@@ -291,39 +302,59 @@ export default function NewPetInfoScreen() {
 					</View>
 				)}
 
-				{/* 写真（最大3枚） */}
-				<Text style={styles.label}>写真 (最大3枚)</Text>
-				<View style={styles.photoContainer}>
-					{photos.map((uri) => (
-						<View key={uri} style={styles.photoBox}>
-							{/* 実際の画像を表示 */}
-							<Image
-								source={{ uri }}
-								style={styles.photo}
-								resizeMode="cover"
-							/>
-						</View>
-					))}
+				{/* 写真（最大3枚）のエラーメッセージ */}
+				{errorPhotos ? (
+					<Text style={styles.errorText}>{errorPhotos}</Text>
+				) : null}
+
+				{/* カメラ & ライブラリ ボタン */}
+				<View style={styles.photoButtonContainer}>
+					<TouchableOpacity
+						style={[styles.photoButton, { marginRight: 8 }]}
+						onPress={handlePickPhotoFromCamera}
+					>
+						<Text style={styles.photoButtonText}>カメラで撮影</Text>
+					</TouchableOpacity>
+					<TouchableOpacity
+						style={styles.photoButton}
+						onPress={handlePickPhotoFromLibrary}
+					>
+						<Text style={styles.photoButtonText}>
+							ライブラリから選択
+						</Text>
+					</TouchableOpacity>
 				</View>
 
-				{/* カメラ */}
-				<TouchableOpacity
-					style={styles.photoButton}
-					onPress={handlePickPhotoFromCamera}
-				>
-					<Text style={styles.photoButtonText}>カメラで撮影</Text>
-				</TouchableOpacity>
+				{/* 写真プレビュー枠：3つのスロット */}
+				<View style={styles.photoSlotContainer}>
+					{[0, 1, 2].map((index) => {
+						const uri = photos[index];
+						if (uri) {
+							return (
+								<View key={index} style={styles.slotBox}>
+									<Image
+										source={{ uri }}
+										style={styles.slotImage}
+										resizeMode="cover"
+									/>
+								</View>
+							);
+						} else {
+							return (
+								<View
+									key={index}
+									style={styles.slotPlaceholderBox}
+								>
+									<Text style={styles.slotPlaceholderText}>
+										写真{index + 1}
+									</Text>
+								</View>
+							);
+						}
+					})}
+				</View>
 
-				{/* ライブラリ */}
-				<TouchableOpacity
-					style={styles.photoButton}
-					onPress={handlePickPhotoFromLibrary}
-				>
-					<Text style={styles.photoButtonText}>
-						ライブラリから選択
-					</Text>
-				</TouchableOpacity>
-
+				{/* 登録ボタン */}
 				<Button title="登録" onPress={handleRegister} />
 			</View>
 		</ScrollView>
@@ -338,6 +369,10 @@ const styles = StyleSheet.create({
 		flex: 1,
 		padding: 16,
 	},
+	description: {
+		marginBottom: 16,
+		lineHeight: 20,
+	},
 	label: {
 		marginTop: 8,
 		fontWeight: "bold",
@@ -351,19 +386,23 @@ const styles = StyleSheet.create({
 		marginBottom: 8,
 		borderRadius: 4,
 	},
+	errorText: {
+		color: "red",
+		marginBottom: 8,
+	},
 	selectBox: {
 		borderWidth: 1,
 		borderColor: "#ccc",
-		padding: 8,
+		padding: 10,
 		borderRadius: 4,
-		marginBottom: 8,
+		marginBottom: 16,
 		justifyContent: "center",
 	},
 	pickerContainer: {
 		borderWidth: 1,
 		borderColor: "#ccc",
 		borderRadius: 4,
-		marginBottom: 8,
+		marginBottom: 16,
 		padding: 8,
 	},
 	picker: {
@@ -387,33 +426,46 @@ const styles = StyleSheet.create({
 		alignSelf: "flex-end",
 		marginTop: 8,
 	},
-	photoContainer: {
+	photoButtonContainer: {
 		flexDirection: "row",
-		marginBottom: 8,
-		flexWrap: "wrap", // 複数行に折り返し
-	},
-	photoBox: {
-		width: 80,
-		height: 80,
-		borderWidth: 1,
-		borderColor: "#ccc",
-		marginRight: 8,
-		marginBottom: 8,
-		borderRadius: 4,
-		overflow: "hidden",
-	},
-	photo: {
-		width: "100%",
-		height: "100%",
+		marginBottom: 16,
 	},
 	photoButton: {
+		flex: 1,
 		backgroundColor: "#007bff",
 		borderRadius: 4,
-		padding: 8,
+		padding: 10,
 		alignItems: "center",
-		marginBottom: 8,
 	},
 	photoButtonText: {
 		color: "#fff",
+	},
+	photoSlotContainer: {
+		marginBottom: 16,
+	},
+	slotBox: {
+		width: "100%",
+		height: 200,
+		backgroundColor: "#eee",
+		borderRadius: 4,
+		marginBottom: 8,
+		overflow: "hidden",
+	},
+	slotImage: {
+		width: "100%",
+		height: "100%",
+	},
+	slotPlaceholderBox: {
+		width: "100%",
+		height: 200,
+		backgroundColor: "#eee",
+		borderRadius: 4,
+		marginBottom: 8,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	slotPlaceholderText: {
+		color: "#666",
+		fontWeight: "bold",
 	},
 });

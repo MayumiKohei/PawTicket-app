@@ -10,7 +10,7 @@ export default function PetInfoScreen() {
 			<CustomButton
 				title="愛犬情報、証明書の新規登録"
 				color="blue"
-				onPress={() => navigation.navigate("NewPetInfo" as never)}
+				onPress={() => navigation.navigate("PetInfo2" as never)}
 			/>
 			<CustomButton
 				title="登録済みの証明書の更新、または愛犬情報の変更"
