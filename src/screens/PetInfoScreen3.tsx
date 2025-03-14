@@ -14,12 +14,12 @@ import * as ImagePicker from "expo-image-picker";
 
 export default function VaccinationCertificateScreen() {
 	// ワクチン接種日
-	const [birthYear, setBirthYear] = useState("2023");
-	const [birthMonth, setBirthMonth] = useState("01");
-	const [birthDay, setBirthDay] = useState("01");
-	const [showBirthPicker, setShowBirthPicker] = useState(false);
+	const [year, setYear] = useState("2023");
+	const [month, setMonth] = useState("01");
+	const [day, setDay] = useState("01");
+	const [showDayPicker, setShowDayPicker] = useState(false);
 
-	// 接種証明書の写真(1枚想定)
+	// 接種証明書の写真
 	const [certPhoto, setCertPhoto] = useState<string | null>(null);
 
 	// カメラ撮影
@@ -117,20 +117,20 @@ export default function VaccinationCertificateScreen() {
 			<Text style={styles.label}>ワクチン接種日</Text>
 			<TouchableOpacity
 				style={styles.selectBox}
-				onPress={() => setShowBirthPicker(!showBirthPicker)}
+				onPress={() => setShowDayPicker(!showDayPicker)}
 			>
 				<Text>
-					{birthYear}年 {birthMonth}月 {birthDay}日
+					{year}年 {month}月 {day}日
 				</Text>
 			</TouchableOpacity>
-			{showBirthPicker && (
+			{showDayPicker && (
 				<View>
 					<View style={styles.birthRow}>
 						<Picker
 							style={[styles.birthPicker, styles.picker]}
 							itemStyle={styles.pickerItem}
-							selectedValue={birthYear}
-							onValueChange={(val) => setBirthYear(val)}
+							selectedValue={year}
+							onValueChange={(val) => setYear(val)}
 						>
 							{Array.from({ length: 30 }, (_, i) => {
 								const year = 2023 - i;
@@ -147,8 +147,8 @@ export default function VaccinationCertificateScreen() {
 						<Picker
 							style={[styles.birthPicker, styles.picker]}
 							itemStyle={styles.pickerItem}
-							selectedValue={birthMonth}
-							onValueChange={(val) => setBirthMonth(val)}
+							selectedValue={month}
+							onValueChange={(val) => setMonth(val)}
 						>
 							{Array.from({ length: 12 }, (_, i) => {
 								const month = i + 1;
@@ -165,8 +165,8 @@ export default function VaccinationCertificateScreen() {
 						<Picker
 							style={[styles.birthPicker, styles.picker]}
 							itemStyle={styles.pickerItem}
-							selectedValue={birthDay}
-							onValueChange={(val) => setBirthDay(val)}
+							selectedValue={day}
+							onValueChange={(val) => setDay(val)}
 						>
 							{Array.from({ length: 31 }, (_, i) => {
 								const day = i + 1;
@@ -182,7 +182,7 @@ export default function VaccinationCertificateScreen() {
 					</View>
 					<TouchableOpacity
 						style={styles.closePickerButton}
-						onPress={() => setShowBirthPicker(false)}
+						onPress={() => setShowDayPicker(false)}
 					>
 						<Text style={{ color: "#fff" }}>OK</Text>
 					</TouchableOpacity>
