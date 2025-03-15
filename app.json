@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "DogRunApp",
-    "slug": "DogRunApp",
+    "name": "PawTicket-app",
+    "slug": "pawticket-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -30,7 +30,20 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
-    ]
+      ],
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "4afd304f-e042-4282-814b-0e979698b0ae"
+      }
+    },
+    "owner": "koooohey",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/4afd304f-e042-4282-814b-0e979698b0ae"
+    }
   }
 }

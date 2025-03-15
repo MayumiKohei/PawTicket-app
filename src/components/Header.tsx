@@ -12,7 +12,7 @@ type Props = Readonly<{
 // 左アイコン (bars) を返すコンポーネント
 export function HeaderLeftButton({ onPressLeft }: Props) {
 	return (
-		<TouchableOpacity onPress={onPressLeft}>
+		<TouchableOpacity onPress={onPressLeft} style={{ marginLeft: 20 }}>
 			<FontAwesome6 name="bars" size={24} color="#333" />
 		</TouchableOpacity>
 	);
@@ -20,7 +20,7 @@ export function HeaderLeftButton({ onPressLeft }: Props) {
 
 export function HeaderRightButton({ onPressRight }: Props) {
 	return (
-		<TouchableOpacity onPress={onPressRight}>
+		<TouchableOpacity onPress={onPressRight} style={{ marginRight: 20 }}>
 			<FontAwesome5 name="address-card" size={24} color="#333" />
 		</TouchableOpacity>
 	);
