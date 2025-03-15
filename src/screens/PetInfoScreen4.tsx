@@ -13,7 +13,7 @@ import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 
-export default function PetInfoScreen3() {
+export default function PetInfoScreen4() {
 	// ワクチン接種日
 	const [year, setYear] = useState("2023");
 	const [month, setMonth] = useState("01");
@@ -68,19 +68,19 @@ export default function PetInfoScreen3() {
 		if (!certPhoto) {
 			Alert.alert(
 				"エラー",
-				"狂犬病予防接種証明書の写真を登録してください。"
+				"混合ワクチン接種証明書の写真を登録してください。"
 			);
 			return;
 		}
 		// 正常な場合 → ここでサーバー送信等
-		Alert.alert("登録完了", "狂犬病予防接種証明書を登録しました。");
-		navigation.navigate("PetInfo4" as never);
+		Alert.alert("登録完了", "混合ワクチン接種証明書を登録しました。");
+		navigation.navigate("PetInfo5" as never);
 	};
 
 	return (
 		<ScrollView style={styles.container}>
 			<Text style={styles.description}>
-				狂犬病予防接種証明書の写真を登録してください。{"\n"}
+				混合ワクチン接種証明書の写真を登録してください。{"\n"}
 				※対象の愛犬のお名前、生年月日、接種日が明記された証明書を使用してください。
 			</Text>
 
@@ -114,14 +114,14 @@ export default function PetInfoScreen3() {
 					// 未登録の場合のプレースホルダー
 					<View style={styles.placeholderBox}>
 						<Text style={styles.placeholderText}>
-							狂犬病予防接種証明書
+							混合ワクチン接種証明書
 						</Text>
 					</View>
 				)}
 			</View>
 
 			{/* 接種日 */}
-			<Text style={styles.label}>予防接種日</Text>
+			<Text style={styles.label}>混合ワクチン接種日</Text>
 			<TouchableOpacity
 				style={styles.selectBox}
 				onPress={() => setShowDayPicker(!showDayPicker)}

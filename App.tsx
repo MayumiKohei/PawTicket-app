@@ -11,6 +11,10 @@ import HomeScreen from "@/screens/HomeScreen";
 import PetInfoScreen from "@/screens/PetInfoScreen";
 import PetInfoScreen2 from "@/screens/PetInfoScreen2";
 import PetInfoScreen3 from "@/screens/PetInfoScreen3";
+import PetInfoScreen4 from "@/screens/PetInfoScreen4";
+import PetInfoScreen5 from "@/screens/PetInfoScreen5";
+import PetInfoScreen6 from "@/screens/PetInfoScreen6";
+import SubscriptionScreen from "@/screens/SubscriptionScreen";
 import { CustomDrawerContent } from "@/components/CustomDrawerContent";
 import NotificationsScreen from "@/screens/NotificationsScreen";
 import FAQScreen from "@/screens/FAQScreen";
@@ -98,7 +102,39 @@ export default function App() {
 					name="PetInfo3"
 					component={PetInfoScreen3}
 					options={{
-						title: "ワクチン接種証明書登録",
+						title: "狂犬病予防接種証明書登録",
+						headerBackTitle: "戻る",
+					}}
+				/>
+				<Stack.Screen
+					name="PetInfo4"
+					component={PetInfoScreen4}
+					options={{
+						title: "混合ワクチン接種証明書登録",
+						headerBackTitle: "戻る",
+					}}
+				/>
+				<Stack.Screen
+					name="PetInfo5"
+					component={PetInfoScreen5}
+					options={{
+						title: "ペット同伴誓約書",
+						headerBackTitle: "戻る",
+					}}
+				/>
+				<Stack.Screen
+					name="PetInfo6"
+					component={PetInfoScreen6}
+					options={{
+						title: "登録完了",
+						headerBackTitle: "戻る",
+					}}
+				/>
+				<Stack.Screen
+					name="Subscription"
+					component={SubscriptionScreen}
+					options={{
+						title: "サブスクリプション登録",
 						headerBackTitle: "戻る",
 					}}
 				/>
